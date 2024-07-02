@@ -10,6 +10,7 @@ process.on('unhandledRejection', (reason, promise) => {
 import authRouter from '../Backend/routes/authRoutes.js';
 import userRouter from '../Backend/routes/userRoutes.js';
 import postRouter from '../Backend/routes/postRoutes.js';
+import notificationRouter from '../Backend/routes/notificationRoutes.js';
 import connectToMongoDB from './DB/connectToMongoDB.js';
 import globalErrorHandler from '../Backend/controllers/errorController.js';
 
@@ -32,6 +33,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/post', postRouter);
+app.use('/api/notification', notificationRouter);
 
 app.use('*', (req, res, next) => {
   res.send(`Cannot find ${req.originalUrl} on this url`);
