@@ -17,6 +17,8 @@ const RightPanel = () => {
               <RightPanelSkeleton />
               <RightPanelSkeleton />
               <RightPanelSkeleton />
+              <RightPanelSkeleton />
+              <RightPanelSkeleton />
             </>
           )}
           {!isLoading &&

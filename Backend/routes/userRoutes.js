@@ -12,7 +12,7 @@ import protectRoute from '../middlewares/protectRoute.js';
 const router = express.Router();
 
 router.use(protectRoute);
-router.get('/getme', getme);
+router.get('/me', getme);
 router.get('/suggested', getSuggestedUser);
 router.get('/profile:/username', getUserProfile);
 

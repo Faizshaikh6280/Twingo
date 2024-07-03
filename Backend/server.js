@@ -13,6 +13,7 @@ import postRouter from '../Backend/routes/postRoutes.js';
 import notificationRouter from '../Backend/routes/notificationRoutes.js';
 import connectToMongoDB from './DB/connectToMongoDB.js';
 import globalErrorHandler from '../Backend/controllers/errorController.js';
+import morgan from 'morgan';
 
 dotenv.config({ path: './.env' });
 
@@ -29,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
-
+app.use(morgan('dev'));
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/post', postRouter);

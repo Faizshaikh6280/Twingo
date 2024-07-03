@@ -1,8 +1,8 @@
 function errorController(err, req, res, next) {
-  console.log("Error 💥", err);
+  console.log('Error 💥', err);
 
   res.status(err.statusCode || 500).json({
-    status: err.status || "fail",
+    status: err.status || 'fail',
     message: err.message,
   });
 }
