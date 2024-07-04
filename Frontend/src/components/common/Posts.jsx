@@ -1,25 +1,40 @@
 import Post from './Post';
 import PostSkeleton from '../skeletons/PostSkeleton';
 import { POSTS } from '../../utils/db/dummy';
+import useGetPosts from '../../hooks/useGetPosts';
 
-const Posts = () => {
-  const isLoading = false;
+const getPostsEndPoint = function (feedType) {
+  switch (feedType) {
+    case 'forYou':
+      return '/api/post/all';
+    case 'following':
+      return '/api/post/following';
+    default:
+      return '/api/post/all';
+  }
+};
+
+const Posts = ({ feedType }) => {
+  const POST_END_POINT = getPostsEndPoint(feedType);
+  const { loadingPosts, posts } = useGetPosts(POST_END_POINT, feedType);
+
+  console.log(posts);
 
   return (
     <>
-      {isLoading && (
+      {loadingPosts && (
         <div className="flex flex-col justify-center">
           <PostSkeleton />
           <PostSkeleton />
           <PostSkeleton />
         </div>
       )}
-      {!isLoading && POSTS?.length === 0 && (
+      {!loadingPosts && posts?.length === 0 && (
         <p className="text-center my-4">No posts in this tab. Switch 👻</p>
       )}
-      {!isLoading && POSTS && (
+      {!loadingPosts && posts && (
         <div>
-          {POSTS.map((post) => (
+          {posts.map((post) => (
             <Post key={post._id} post={post} />
           ))}
         </div>

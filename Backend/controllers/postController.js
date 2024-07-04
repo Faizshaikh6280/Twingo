@@ -135,7 +135,6 @@ export const getAllPost = catchAsync(async (req, res, next) => {
   const posts = await postModel.find().populate('userId').populate({
     path: 'comments.userId',
   });
-
   res.status(200).json({
     status: 'success',
     length: posts.length,
@@ -168,7 +167,7 @@ export const getFollowingPost = catchAsync(async (req, res, next) => {
   const user = await userModel.findById(userId);
   if (!user) return next(new AppError('user not found!', 404));
 
-  const feedPosts = await postModel
+  const posts = await postModel
     .find({ userId: { $in: user.following } })
     .sort({ createdAt: -1 })
     .populate({
@@ -178,8 +177,8 @@ export const getFollowingPost = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    length: feedPosts.length,
-    feedPosts,
+    length: posts.length,
+    posts,
   });
 });
 

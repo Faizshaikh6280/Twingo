@@ -18,7 +18,6 @@ const Sidebar = () => {
   const { logout, isLogingOut } = useLogout();
 
   const { data: authUser } = useQuery({ queryKey: ['authuser'] });
-  console.log(authUser);
 
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
