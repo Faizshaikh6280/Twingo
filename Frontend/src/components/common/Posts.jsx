@@ -1,6 +1,5 @@
 import Post from './Post';
 import PostSkeleton from '../skeletons/PostSkeleton';
-import { POSTS } from '../../utils/db/dummy';
 import useGetPosts from '../../hooks/useGetPosts';
 
 const getPostsEndPoint = function (feedType) {
