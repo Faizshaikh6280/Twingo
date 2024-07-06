@@ -17,6 +17,6 @@ router.get('/profile/:username', getUserProfile);
 
 router.post('/follow/:id', followOrUnfollowUser);
 
-router.patch('/update-profile', updateUserProfile);
+router.post('/update-profile', updateUserProfile);
 
 export default router;

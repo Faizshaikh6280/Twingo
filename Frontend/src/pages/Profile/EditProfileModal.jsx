@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import useUpdateProfile from '../../hooks/useUpdateProfile';
+import toast from 'react-hot-toast';
 
 const EditProfileModal = ({ userProfile }) => {
   const [formData, setFormData] = useState({
@@ -11,6 +13,8 @@ const EditProfileModal = ({ userProfile }) => {
     currentPassword: userProfile.currentPassword,
   });
 
+  const { updateProfile, updatingProfile } = useUpdateProfile(userProfile.username);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -19,6 +23,7 @@ const EditProfileModal = ({ userProfile }) => {
     <>
       <button
         className="btn btn-outline rounded-full btn-sm"
+        id="btn-dialog"
         onClick={() => document.getElementById('edit_profile_modal').showModal()}
       >
         Edit profile
@@ -30,7 +35,15 @@ const EditProfileModal = ({ userProfile }) => {
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              alert('Profile updated successfully');
+              updateProfile(formData, {
+                onSuccess: () => {
+                  toast.success('Profile updated successfully!');
+                  document.getElementById('profile-page').click();
+                },
+                onError: (err) => {
+                  toast.error(err.message);
+                },
+              });
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -39,7 +52,7 @@ const EditProfileModal = ({ userProfile }) => {
                 placeholder="Full Name"
                 className="flex-1 input border border-gray-700 rounded p-2 input-md"
                 value={formData.fullname}
-                name="fullName"
+                name="fullname"
                 onChange={handleInputChange}
               />
               <input
@@ -94,7 +107,9 @@ const EditProfileModal = ({ userProfile }) => {
               name="link"
               onChange={handleInputChange}
             />
-            <button className="btn btn-primary rounded-full btn-sm text-white">Update</button>
+            <button className="btn btn-primary rounded-full btn-sm text-white">
+              {updatingProfile ? <span className="loading loading-spinner" /> : 'Update'}
+            </button>
           </form>
         </div>
         <form method="dialog" className="modal-backdrop">

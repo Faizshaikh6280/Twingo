@@ -14,6 +14,7 @@ import useGetUserProfile from '../../hooks/auth/useGetUserProfile';
 import { parseISO, format } from 'date-fns';
 import useFollowUnfollowUser from '../../hooks/useFollowUnfollowUser';
 import toast from 'react-hot-toast';
+import useUpdateProfile from '../../hooks/useUpdateProfile';
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
@@ -29,7 +30,7 @@ const ProfilePage = () => {
 
   const { data, loadingUserProfile, isError } = useGetUserProfile(username);
   const { followUnfollowUser } = useFollowUnfollowUser();
-
+  const { updateProfile, updatingProfile } = useUpdateProfile();
   const user = data?.user;
 
   // Parse the date string to a Date object
@@ -62,7 +63,7 @@ const ProfilePage = () => {
           {/* HEADER */}
           {loadingUserProfile && <ProfileHeaderSkeleton />}
 
-          <div className="flex flex-col">
+          <div className="flex flex-col" id="profile-page">
             {!loadingUserProfile && user && (
               <>
                 <div className="flex gap-10 px-4 py-2 items-center">
@@ -144,9 +145,27 @@ const ProfilePage = () => {
                   {(coverImg || profileImg) && (
                     <button
                       className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                      onClick={() => alert('Profile updated successfully')}
+                      onClick={() => {
+                        updateProfile(
+                          { profileImg, coverImg },
+                          {
+                            onSuccess: () => {
+                              if (username === authuser.username) {
+                                queryClient.invalidateQueries({ queryKey: ['authuser'] });
+                              }
+                              queryClient.invalidateQueries({ queryKey: [`${username}`] });
+                              setProfileImg(null);
+                              setCoverImg(null);
+                              toast.success('Profile updated successfully!');
+                            },
+                            onError: (err) => {
+                              toast.error(err.message);
+                            },
+                          }
+                        );
+                      }}
                     >
-                      Update
+                      {updatingProfile ? 'updating...' : 'Update'}
                     </button>
                   )}
                 </div>
