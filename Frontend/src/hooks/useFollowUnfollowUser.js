@@ -7,7 +7,7 @@ function useFollowUnfollowUser() {
     isError,
     error,
   } = useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async ({ id }) => {
       try {
         const res = await fetch(`/api/user/follow/${id}`, {
           method: 'POST',

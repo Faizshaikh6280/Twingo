@@ -65,7 +65,7 @@ export const likeOrUnlikePost = catchAsync(async (req, res, next) => {
 
   if (isLiked) {
     // remove the userid from liked array
-    await postModel.findByIdAndUpdate(
+    const updatedPost = await postModel.findByIdAndUpdate(
       post._id,
       {
         $pull: {
@@ -81,10 +81,10 @@ export const likeOrUnlikePost = catchAsync(async (req, res, next) => {
         likedPosts: post._id,
       },
     });
-
     return res.status(200).json({
       status: 'success',
       message: 'Post unliked successfull!',
+      post: updatedPost,
     });
   }
 
@@ -99,10 +99,11 @@ export const likeOrUnlikePost = catchAsync(async (req, res, next) => {
     to: post.userId,
     type: 'like',
   });
-
+  console.log('like');
   res.status(200).json({
     status: 'success',
     message: 'Post liked successfull!',
+    post,
   });
 });
 
@@ -129,13 +130,18 @@ export const commentPost = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     message: 'Post commented successfull!',
+    post,
   });
 });
 
 export const getAllPost = catchAsync(async (req, res, next) => {
-  const posts = await postModel.find().populate('userId').populate({
-    path: 'comments.userId',
-  });
+  const posts = await postModel
+    .find()
+    .populate('userId')
+    .populate({
+      path: 'comments.userId',
+    })
+    .sort('-createdAt');
   res.status(200).json({
     status: 'success',
     length: posts.length,

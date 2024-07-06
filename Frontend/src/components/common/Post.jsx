@@ -8,18 +8,22 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import useDeletePost from '../../hooks/useDeletePost';
 import toast from 'react-hot-toast';
+import useComment from '../../hooks/useComment';
+import useLike from '../../hooks/useLike';
 
 const Post = ({ post }) => {
   const [comment, setComment] = useState('');
   const postOwner = post.userId;
   const { data: authuser } = useQuery({ queryKey: ['authuser'] });
-  const isLiked = false;
+
+  const isLiked = post.likes.includes(authuser._id);
+
   const isMyPost = authuser._id === post.userId._id;
   const formattedDate = '1h';
-  const isCommenting = false;
 
   const { deletePost, deletingPost } = useDeletePost();
-
+  const { comment: commentMutation, isCommenting } = useComment(post._id);
+  const { like: likeMutattion } = useLike();
   const handleDeletePost = () => {
     deletePost(post._id, {
       onSuccess: () => {
@@ -30,9 +34,21 @@ const Post = ({ post }) => {
 
   const handlePostComment = (e) => {
     e.preventDefault();
+    commentMutation(comment, {
+      onSuccess: () => {
+        toast.success('Commented succesfully!');
+        setComment('');
+      },
+      onError: (err) => {
+        toast.error(err.message);
+      },
+    });
   };
 
-  const handleLikePost = () => {};
+  const handleLikePost = (e) => {
+    e.preventDefault();
+    likeMutattion(post._id);
+  };
 
   return (
     <>
@@ -105,7 +121,7 @@ const Post = ({ post }) => {
                         </div>
                         <div className="flex flex-col">
                           <div className="flex items-center gap-1">
-                            <span className="font-bold">{comment.userId.fullName}</span>
+                            <span className="font-bold">{comment.userId.fullname}</span>
                             <span className="text-gray-700 text-sm">
                               @{comment.userId.username}
                             </span>

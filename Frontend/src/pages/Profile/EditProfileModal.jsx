@@ -23,7 +23,6 @@ const EditProfileModal = ({ userProfile }) => {
     <>
       <button
         className="btn btn-outline rounded-full btn-sm"
-        id="btn-dialog"
         onClick={() => document.getElementById('edit_profile_modal').showModal()}
       >
         Edit profile
@@ -38,7 +37,6 @@ const EditProfileModal = ({ userProfile }) => {
               updateProfile(formData, {
                 onSuccess: () => {
                   toast.success('Profile updated successfully!');
-                  document.getElementById('profile-page').click();
                 },
                 onError: (err) => {
                   toast.error(err.message);

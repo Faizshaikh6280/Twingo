@@ -127,16 +127,19 @@ const ProfilePage = () => {
                       className="btn btn-outline rounded-full btn-sm"
                       onClick={(e) => {
                         e.preventDefault();
-                        followUnfollowUser(user._id, {
-                          onSuccess: () => {
-                            const isFollow = authuser.following.includes(user._id);
-                            toast.success(
-                              `You ${isFollow ? 'Unfollowed' : 'follows'} ${data.user.fullname}.`
-                            );
-                            queryClient.invalidateQueries({ queryKey: ['authuser'] });
-                            queryClient.invalidateQueries({ queryKey: ['suggestedUser'] });
-                          },
-                        });
+                        followUnfollowUser(
+                          { id: user._id },
+                          {
+                            onSuccess: () => {
+                              const isFollow = authuser.following.includes(user._id);
+                              toast.success(
+                                `You ${isFollow ? 'Unfollowed' : 'follows'} ${data.user.fullname}.`
+                              );
+                              queryClient.invalidateQueries({ queryKey: ['authuser'] });
+                              queryClient.invalidateQueries({ queryKey: ['suggestedUser'] });
+                            },
+                          }
+                        );
                       }}
                     >
                       {authuser.following.includes(user._id) ? 'Following' : 'Follow'}

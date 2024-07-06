@@ -1,7 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
-function useUpdateProfile() {
+function useUpdateProfile(username) {
+  const { data: authuser } = useQuery({ queryKey: ['authuser'] });
+  const queyClient = useQueryClient();
   const {
     mutate: updateProfile,
     isPending: updatingProfile,
@@ -25,6 +27,13 @@ function useUpdateProfile() {
         return data;
       } catch (error) {
         toast.error(error.message || 'Something wentt wrong');
+      }
+    },
+    onSuccess: () => {
+      queyClient.invalidateQueries({ queryKey: [`${username}`] });
+
+      if (username === authuser.username) {
+        queyClient.invalidateQueries({ queryKey: [`authuser`] });
       }
     },
   });
