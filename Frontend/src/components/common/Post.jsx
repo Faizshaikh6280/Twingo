@@ -10,6 +10,7 @@ import useDeletePost from '../../hooks/useDeletePost';
 import toast from 'react-hot-toast';
 import useComment from '../../hooks/useComment';
 import useLike from '../../hooks/useLike';
+import { formatDateForPost } from '../../utils/date';
 
 const Post = ({ post }) => {
   const [comment, setComment] = useState('');
@@ -19,7 +20,7 @@ const Post = ({ post }) => {
   const isLiked = post.likes.includes(authuser._id);
 
   const isMyPost = authuser._id === post.userId._id;
-  const formattedDate = '1h';
+  const formattedDate = formatDateForPost(post.createdAt);
 
   const { deletePost, deletingPost } = useDeletePost();
   const { comment: commentMutation, isCommenting } = useComment(post._id);

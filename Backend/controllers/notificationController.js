@@ -16,7 +16,7 @@ export const getNotifications = catchAsync(async (req, res, next) => {
     })
     .populate({
       path: 'from',
-      select: 'fullname profileImg',
+      select: 'username profileImg',
     });
 
   // once notification is read mark them as true

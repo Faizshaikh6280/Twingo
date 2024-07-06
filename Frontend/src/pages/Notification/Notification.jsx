@@ -4,32 +4,17 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
+import useGetNotification from '../../hooks/useGetNotification';
+import useDeleteNotification from '../../hooks/useDeleteNotification';
 
 const NotificationPage = () => {
   const isLoading = false;
-  const notifications = [
-    {
-      _id: '1',
-      from: {
-        _id: '1',
-        username: 'johndoe',
-        profileImg: '/avatars/boy2.png',
-      },
-      type: 'follow',
-    },
-    {
-      _id: '2',
-      from: {
-        _id: '2',
-        username: 'janedoe',
-        profileImg: '/avatars/girl1.png',
-      },
-      type: 'like',
-    },
-  ];
 
-  const deleteNotifications = () => {
-    alert('All notifications deleted');
+  const { data } = useGetNotification();
+  const { deleteNotifications } = useDeleteNotification();
+  const deleteNotificationsHandler = (e) => {
+    e.preventDefault();
+    deleteNotifications();
   };
 
   return (
@@ -46,7 +31,7 @@ const NotificationPage = () => {
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li>
-                <a onClick={deleteNotifications}>Delete all notifications</a>
+                <a onClick={deleteNotificationsHandler}>Delete all notifications</a>
               </li>
             </ul>
           </div>
@@ -56,10 +41,10 @@ const NotificationPage = () => {
             <LoadingSpinner size="lg" />
           </div>
         )}
-        {notifications?.length === 0 && (
+        {data?.notifications?.length === 0 && (
           <div className="text-center p-4 font-bold">No notifications 🤔</div>
         )}
-        {notifications?.map((notification) => (
+        {data?.notifications?.map((notification) => (
           <div className="border-b border-gray-700" key={notification._id}>
             <div className="flex gap-2 p-4">
               {notification.type === 'follow' && <FaUser className="w-7 h-7 text-primary" />}

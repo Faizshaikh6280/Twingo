@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 
-function useGetPosts(postEndPoint, feedType) {
+function useGetPosts(postEndPoint, feedType, username) {
   const {
     data,
     isLoading: loadingPosts,
@@ -28,7 +28,7 @@ function useGetPosts(postEndPoint, feedType) {
 
   useEffect(() => {
     refetch();
-  }, [feedType, refetch]);
+  }, [feedType, refetch, username]);
 
   return { data, isRefetching, loadingPosts, isError, error };
 }

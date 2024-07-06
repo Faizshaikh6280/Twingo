@@ -20,7 +20,7 @@ const getPostsEndPoint = function (feedType, userId, username) {
 
 const Posts = ({ feedType, userId, username, setPost = () => {} }) => {
   const POST_END_POINT = getPostsEndPoint(feedType, userId, username);
-  const { loadingPosts, data, isRefetching } = useGetPosts(POST_END_POINT, feedType);
+  const { loadingPosts, data, isRefetching } = useGetPosts(POST_END_POINT, feedType, username);
 
   useEffect(() => {
     setPost((prev) => data?.posts || prev);

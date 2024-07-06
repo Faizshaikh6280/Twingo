@@ -81,7 +81,7 @@ export const getSuggestedUser = catchAsync(async (req, res, next) => {
         _id: 1,
         fullname: 1,
         username: 1,
-        profilePic: 1,
+        profileImg: 1,
       },
     },
   ]);
