@@ -18,9 +18,9 @@ router.use(protectRoute);
 
 router.get('/all', getAllPost);
 router.get('/following', getFollowingPost);
+router.get('/user/:username', getUserPosts);
+router.get('/liked/:id', getLikedPostByUser);
 router.post('/create', createPost);
-router.post('/user/:username', getUserPosts);
-router.get('/liked-post/:id', getLikedPostByUser);
 router.post('/like/:id', likeOrUnlikePost);
 router.post('/comment/:id', commentPost);
 router.delete('/:id', deletePost);

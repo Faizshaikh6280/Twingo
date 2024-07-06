@@ -10,27 +10,24 @@ function useSignup() {
     error,
   } = useMutation({
     mutationFn: async ({ email, username, fullname, password }) => {
-      try {
-        const res = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, username, fullname, password }),
-        });
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, username, fullname, password }),
+      });
 
-        const data = await res.json();
-        console.log(data);
-        if (!res.ok) {
-          throw data;
-        }
-      } catch (error) {
-        throw error;
+      const data = await res.json();
+      console.log(data);
+      if (!res.ok) {
+        throw data;
       }
     },
     onSuccess: () => {
       toast.success('Account created Succesfully!');
       queryClient.invalidateQueries({ queryKey: ['authuser'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestedUser'] });
     },
   });
   return { isSigningup, signUp, isError, error };

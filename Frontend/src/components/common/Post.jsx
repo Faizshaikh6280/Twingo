@@ -5,19 +5,28 @@ import { FaRegBookmark } from 'react-icons/fa6';
 import { FaTrash } from 'react-icons/fa';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import useDeletePost from '../../hooks/useDeletePost';
+import toast from 'react-hot-toast';
 
 const Post = ({ post }) => {
   const [comment, setComment] = useState('');
-  const postOwner = post.user;
+  const postOwner = post.userId;
+  const { data: authuser } = useQuery({ queryKey: ['authuser'] });
   const isLiked = false;
-
-  const isMyPost = true;
-
+  const isMyPost = authuser._id === post.userId._id;
   const formattedDate = '1h';
-
   const isCommenting = false;
 
-  const handleDeletePost = () => {};
+  const { deletePost, deletingPost } = useDeletePost();
+
+  const handleDeletePost = () => {
+    deletePost(post._id, {
+      onSuccess: () => {
+        toast.success('Post deleted Successfully!');
+      },
+    });
+  };
 
   const handlePostComment = (e) => {
     e.preventDefault();
@@ -36,7 +45,7 @@ const Post = ({ post }) => {
         <div className="flex flex-col flex-1">
           <div className="flex gap-2 items-center">
             <Link to={`/profile/${postOwner.username}`} className="font-bold">
-              {postOwner.fullName}
+              {postOwner.fullname}
             </Link>
             <span className="text-gray-700 flex gap-1 text-sm">
               <Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
@@ -45,15 +54,22 @@ const Post = ({ post }) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                <FaTrash className="cursor-pointer hover:text-red-500" onClick={handleDeletePost} />
+                {deletingPost ? (
+                  <span className="loading loading-spinner" />
+                ) : (
+                  <FaTrash
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={handleDeletePost}
+                  />
+                )}
               </span>
             )}
           </div>
           <div className="flex flex-col gap-3 overflow-hidden">
             <span>{post.text}</span>
-            {post.img && (
+            {post.image && (
               <img
-                src={post.img}
+                src={post.image}
                 className="h-80 object-contain rounded-lg border border-gray-700"
                 alt=""
               />
@@ -84,13 +100,15 @@ const Post = ({ post }) => {
                       <div key={comment._id} className="flex gap-2 items-start">
                         <div className="avatar">
                           <div className="w-8 rounded-full">
-                            <img src={comment.user.profileImg || '/avatar-placeholder.png'} />
+                            <img src={comment.userId.profileImg || '/avatar-placeholder.png'} />
                           </div>
                         </div>
                         <div className="flex flex-col">
                           <div className="flex items-center gap-1">
-                            <span className="font-bold">{comment.user.fullName}</span>
-                            <span className="text-gray-700 text-sm">@{comment.user.username}</span>
+                            <span className="font-bold">{comment.userId.fullName}</span>
+                            <span className="text-gray-700 text-sm">
+                              @{comment.userId.username}
+                            </span>
                           </div>
                           <div className="text-sm">{comment.text}</div>
                         </div>

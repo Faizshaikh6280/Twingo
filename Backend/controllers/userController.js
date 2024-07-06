@@ -19,65 +19,61 @@ export const getme = catchAsync(async (req, res, next) => {
 export const getSuggestedUser = catchAsync(async (req, res, next) => {
   const currentUser = await userModel.findOne({ _id: req.user._id }).select('following');
   // Total 6 users will be suggested
-  let suggestedUsers = [];
-  //- 2 Random users will be from the follwers of currentUser.
-  const followersUser = await userModel.aggregate([
-    {
-      // get the current user
-      $match: {
-        _id: req.user._id,
-      },
-    },
-    // unwind the followers array
-    {
-      $unwind: '$followers',
-    },
-    //Looking to get the full details of follwers array
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'followers',
-        foreignField: '_id',
-        as: 'followerDetails',
-      },
-    },
-    //unwind the resulting array from lookup
-    {
-      $unwind: '$followerDetails',
-    },
-    // get 2 random users
-    {
-      $sample: { size: 2 },
-    },
-    // Project the desired fields
-    {
-      $project: {
-        _id: '$followerDetails._id',
-        fullname: '$followerDetails.fullname',
-        username: '$followerDetails.username',
-        profilePic: '$followerDetails.profilePic',
-      },
-    },
-    {
-      $addFields: {
-        status: 'followers',
-      },
-    },
-  ]);
-
-  suggestedUsers.push(...followersUser);
-
+  // //- 2 Random users will be from the follwers of currentUser.
+  // const followersUser = await userModel.aggregate([
+  //   {
+  //     // get the current user
+  //     $match: {
+  //       _id: req.user._id,
+  //     },
+  //   },
+  //   // unwind the followers array
+  //   {
+  //     $unwind: '$followers',
+  //   },
+  //   //Looking to get the full details of follwers array
+  //   {
+  //     $lookup: {
+  //       from: 'users',
+  //       localField: 'followers',
+  //       foreignField: '_id',
+  //       as: 'followerDetails',
+  //     },
+  //   },
+  //   //unwind the resulting array from lookup
+  //   {
+  //     $unwind: '$followerDetails',
+  //   },
+  //   // get 2 random users
+  //   {
+  //     $sample: { size: 2 },
+  //   },
+  //   // Project the desired fields
+  //   {
+  //     $project: {
+  //       _id: '$followerDetails._id',
+  //       fullname: '$followerDetails.fullname',
+  //       username: '$followerDetails.username',
+  //       profilePic: '$followerDetails.profilePic',
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       status: 'followers',
+  //     },
+  //   },
+  // ]);
   //- 2 users will be from random user that user does not follows
-  const randomUser = await userModel.aggregate([
+  currentUser.following.push(currentUser._id);
+  let randomUser = await userModel.aggregate([
     {
       $match: {
-        _id: { $ne: req.user._id },
         _id: { $nin: currentUser.following },
       },
     },
     // Get 2 random users
     {
-      $sample: { size: 2 },
+      $sample: { size: 10 },
     },
     // Project the desired fields
     {
@@ -88,64 +84,62 @@ export const getSuggestedUser = catchAsync(async (req, res, next) => {
         profilePic: 1,
       },
     },
-    {
-      $addFields: {
-        status: 'randomUser',
-      },
-    },
   ]);
 
-  suggestedUsers.push(...randomUser);
-  //- 2 users will be from following of current user following. (make sure current user does not follow those)
-  const followingOfFollowing = await userModel.aggregate([
-    {
-      $match: {
-        _id: { $in: currentUser.following },
-      },
-    },
-    {
-      $unwind: '$following',
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'following',
-        foreignField: '_id',
-        as: 'followingDetails',
-      },
-    },
-    {
-      $unwind: '$followingDetails',
-    },
-    {
-      $match: {
-        'followingDetails._id': { $nin: currentUser.following },
-        'followingDetails._id': { $ne: currentUser._id },
-      },
-    },
-    {
-      $sample: { size: 2 },
-    },
-    {
-      $project: {
-        _id: '$followingDetails._id',
-        fullname: '$followingDetails.fullname',
-        username: '$followingDetails.username',
-        profilePic: '$followingDetails.profilePic',
-      },
-    },
-    {
-      $addFields: {
-        status: 'followingOfFollowing',
-      },
-    },
-  ]);
+  // randomUser = randomUser.filter((el) => !el._id.equals(currentUser._id));
 
-  suggestedUsers.push(...followingOfFollowing);
+  // //- 2 users will be from following of current user following. (make sure current user does not follow those)
+  // const followingOfFollowing = await userModel.aggregate([
+  //   {
+  //     $match: {
+  //       _id: { $ne: currentUser._id },
+  //       _id: { $nin: followersUser },
+  //       _id: { $nin: randomUser },
+  //       _id: { $in: currentUser.following },
+  //     },
+  //   },
+  //   {
+  //     $unwind: '$following',
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'users',
+  //       localField: 'following',
+  //       foreignField: '_id',
+  //       as: 'followingDetails',
+  //     },
+  //   },
+  //   {
+  //     $unwind: '$followingDetails',
+  //   },
+  //   {
+  //     $match: {
+  //       'followingDetails._id': { $ne: currentUser._id },
+  //       'followingDetails._id': { $nin: currentUser.following },
+  //     },
+  //   },
+  //   {
+  //     $sample: { size: 2 },
+  //   },
+  //   {
+  //     $project: {
+  //       _id: '$followingDetails._id',
+  //       fullname: '$followingDetails.fullname',
+  //       username: '$followingDetails.username',
+  //       profilePic: '$followingDetails.profilePic',
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       status: 'followingOfFollowing',
+  //     },
+  //   },
+  // ]);
+
   res.status(200).json({
     status: 'success',
-    length: suggestedUsers.length,
-    suggestedUsers,
+    length: randomUser.length,
+    suggestedUsers: randomUser,
   });
 });
 
@@ -200,17 +194,36 @@ export const followOrUnfollowUser = catchAsync(async (req, res, next) => {
 
 export const getUserProfile = catchAsync(async (req, res, next) => {
   const user = await userModel.findOne({ username: req.params.username });
+
   if (!user) return next(new AppError('Username does not exists', 404));
+
   res.status(200).json({
     status: 'success',
     user,
   });
 });
 export const updateUserProfile = catchAsync(async (req, res, next) => {
+  const { newPassword, currentPassword } = req.body;
+
+  const user = await userModel.findOne({ _id: req.user._id }).select('+password');
+
+  if (!user) return next(new AppError('User not found!', 400));
+
+  // Password Checks here..
+  if ((!newPassword && currentPassword) || (!currentPassword && newPassword)) {
+    return next(new AppError('Please provide both new Password and current password', 400));
+  }
+
+  // means both password given or none of them
+  if (newPassword && currentPassword) {
+    const isMatch = await user.comparePassword(currentPassword, user.password);
+    if (!isMatch) return next(new AppError('Current password is incorrect', 400));
+    if (newPassword.length < 6)
+      return next(new AppError('New password must be atleast 6 characters long.'));
+  }
+
   const { fullname, username, email, bio, link } = req.body;
   let { profileImg, coverImg } = req.body;
-
-  const user = await userModel.findOne({ _id: req.user._id });
 
   if (!user) return next(new AppError('User not found!', 400));
 
@@ -232,6 +245,7 @@ export const updateUserProfile = catchAsync(async (req, res, next) => {
     coverImg = uploadedCoverimg.secure_url;
   }
 
+  user.password = newPassword || user.password;
   user.fullname = fullname || user.fullname;
   user.email = email || user.email;
   user.username = username || user.username;
@@ -246,37 +260,4 @@ export const updateUserProfile = catchAsync(async (req, res, next) => {
     status: 'success',
     user,
   });
-});
-
-export const updatePassword = catchAsync(async (req, res, next) => {
-  const { newPassword, currentPassword } = req.body;
-
-  const user = await userModel.findOne({ _id: req.user._id }).select('password');
-
-  if (!user) return next(new AppError('User not found!', 400));
-
-  // Password Checks here..
-  if ((!newPassword && currentPassword) || (!currentPassword && newPassword)) {
-    return next(new AppError('Please provide both new Password and current password', 400));
-  }
-
-  // means both password given
-  if (newPassword && currentPassword) {
-    const isMatch = await user.comparePassword(currentPassword, user.password);
-    if (!isMatch) return next(new AppError('Current password is incorrect', 400));
-    if (newPassword.length < 6)
-      return next(new AppError('New password must be atleast 6 characters long.'));
-
-    // if everythings Okay, then update the new Password
-    user.password = newPassword; // password will hashed by "pre middleware in userModel on save user"
-    await user.save();
-
-    res.status(200).json({
-      status: 'success',
-      message: 'Password updated sucessfully!',
-      user,
-    });
-  } else {
-    return next(new AppError('Please provide both new Password and current password', 400));
-  }
 });

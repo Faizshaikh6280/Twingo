@@ -8,6 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 export const createPost = catchAsync(async (req, res, next) => {
   let { text, image } = req.body;
   const userId = req.user._id;
+
   const user = await userModel.findById(userId);
   if (!user) return next(new AppError('User not found', 404));
   if (!text && !image) return next(new AppError('Post must have either text or image'));
@@ -157,7 +158,7 @@ export const getLikedPostByUser = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     length: likedPosts.length,
-    likedPosts,
+    posts: likedPosts,
   });
 });
 
