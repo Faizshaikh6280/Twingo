@@ -14,6 +14,7 @@ import notificationRouter from '../Backend/routes/notificationRoutes.js';
 import connectToMongoDB from './DB/connectToMongoDB.js';
 import globalErrorHandler from '../Backend/controllers/errorController.js';
 import morgan from 'morgan';
+import path from 'path';
 
 dotenv.config({ path: './.env' });
 
@@ -35,11 +36,16 @@ app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/post', postRouter);
 app.use('/api/notification', notificationRouter);
-
-app.use('*', (req, res, next) => {
-  res.send(`Cannot find ${req.originalUrl} on this url`);
-});
 app.use(globalErrorHandler);
+
+if (process.env.NODE_ENV === 'production') {
+  const __dirname = path.resolve();
+  app.use(express.static(path.join(__dirname, '/Frontend/dist')));
+
+  app.use('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '/Frontend', 'dist', 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);

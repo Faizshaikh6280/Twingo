@@ -6,6 +6,7 @@ import { FaUser } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 import useGetNotification from '../../hooks/useGetNotification';
 import useDeleteNotification from '../../hooks/useDeleteNotification';
+import toast from 'react-hot-toast';
 
 const NotificationPage = () => {
   const isLoading = false;
@@ -14,6 +15,11 @@ const NotificationPage = () => {
   const { deleteNotifications } = useDeleteNotification();
   const deleteNotificationsHandler = (e) => {
     e.preventDefault();
+
+    if (data?.notifications.length === 0) {
+      toast.error('Nothing to delete!');
+      return;
+    }
     deleteNotifications();
   };
 
